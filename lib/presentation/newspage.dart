@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
@@ -24,14 +25,11 @@ class Newspage extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            Container(
+            SizedBox(
               width: screensize.width,
               height: screensize.height,
               // color: Color.fromARGB(255, 23, 18, 2),
-              child: Image(
-                fit: BoxFit.cover,
-                image: NetworkImage(imgurl),
-              ),
+              child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: imgurl),
             ),
             Container(
               decoration: BoxDecoration(
@@ -40,10 +38,10 @@ class Newspage extends StatelessWidget {
                   end: Alignment.bottomCenter,
                   stops: [0.1, 0.4, 0.6, 0.9],
                   colors: [
-                    Color(0xffffff),
-                    Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
-                    Color.fromARGB(255, 0, 0, 0).withOpacity(0.6),
-                    Color.fromARGB(255, 0, 0, 0)
+                    const Color(0xffffff),
+                    const Color.fromARGB(255, 0, 0, 0).withOpacity(0.4),
+                    const Color.fromARGB(255, 0, 0, 0).withOpacity(0.6),
+                    const Color.fromARGB(255, 0, 0, 0)
                   ],
                 ),
               ),
@@ -73,7 +71,7 @@ class Newspage extends StatelessWidget {
                           ],
                         )),
                   ),
-                  Spacer(),
+                  const Spacer(),
                   Container(
                     padding: const EdgeInsets.all(24),
                     child: Column(
@@ -99,7 +97,7 @@ class Newspage extends StatelessWidget {
                                 fontFamily: 'roboto',
                               ),
                             ),
-                            Spacer(),
+                            const Spacer(),
                             Text(
                               Date,
                               style: TextStyle(

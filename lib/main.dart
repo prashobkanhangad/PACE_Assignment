@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:pace/controller/getcontroller.dart';
 import 'package:pace/core/constants.dart';
+import 'package:pace/db/model.dart';
 import 'package:pace/presentation/homepage.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Hive.initFlutter();
+  Hive.registerAdapter(NewsmodelAdapter());
+
+  Get.put(Newscontroller()).fetchdata();
+  Get.put(Newscontroller()).getnewsdata();
   runApp(const MyApp());
 }
-
-// @override
-// void initState() {
-// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

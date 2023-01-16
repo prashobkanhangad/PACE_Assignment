@@ -1,7 +1,12 @@
+import 'dart:async';
+import 'dart:developer';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pace/controller/getcontroller.dart';
 import 'package:pace/core/constants.dart';
+import 'package:pace/db/model.dart';
 import 'package:pace/presentation/newspage.dart';
 
 class Homepage extends StatelessWidget {
@@ -11,63 +16,70 @@ class Homepage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    getcontroller.fetchdata;
+    print('main builder');
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: kappbarbackgroundcolor,
-        title: const Text(
-          'HEADLINES',
-          style: TextStyle(
-              fontFamily: 'roboto',
-              fontSize: 29,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.5),
+        appBar: AppBar(
+          backgroundColor: kappbarbackgroundcolor,
+          title: const Text(
+            'HEADLINES',
+            style: TextStyle(
+                fontFamily: 'roboto',
+                fontSize: 29,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.5),
+          ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: GetBuilder<Newscontroller>(builder: (getdata) {
-        return getdata.newslist.isEmpty
-            ? Center(
-                child: CircularProgressIndicator(
-                color: whitecolor,
-              ))
-            : ListView.separated(
-                itemBuilder: (context, index) {
-                  final data = getdata.newslist[index];
-                  final title = data['title'];
-                  final source = data['source']['name'];
-                  final imgurl = data['urlToImage'];
-                  final description = data['description'];
-                  final String publishedat = data['publishedAt'];
-                  final date = publishedat.split('T')[0];
-                  print(date);
+        body: ValueListenableBuilder(
+            valueListenable: getcontroller.newsnotifier,
+            builder:
+                (BuildContext ctx, List<Newsmodel> newnewslist, Widget? child) {
+              return newnewslist.isEmpty
+                  ? Center(
+                      child: CircularProgressIndicator(
+                      color: whitecolor,
+                    ))
+                  : ListView.separated(
+                      itemBuilder: (context, index) {
+                        // Timer.periodic(const Duration(milliseconds: 1000), (timer) {
+                        getcontroller.addnewsdata(index);
+                        // }
+                        // );
 
-                  // log(title.toString());
-                  return Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
-                    child: GestureDetector(
-                        onTap: () => Get.to(() => (Newspage(
-                              imgurl: imgurl,
-                              newstitle: title,
-                              source: source,
-                              description: description,
-                              Date: date,
-                            ))),
-                        child: Newscardwidget(
-                          newstitle: title,
-                          source: source,
-                          imgurl: imgurl,
-                          date: date,
-                        )),
-                  );
-                },
-                separatorBuilder: (context, index) {
-                  return const SizedBox();
-                },
-                itemCount: getcontroller.newslist.length);
-      }),
-    );
+                        final hivedata = newnewslist[index];
+                        final hivesourse = hivedata.sourse;
+                        final hiveimgurl = hivedata.imgurl;
+                        final hivedate = hivedata.date;
+                        final hivedescription = hivedata.description;
+                        final hivenewstitle = hivedata.newstitle;
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0, vertical: 12),
+                          child: GestureDetector(
+                              onTap: () => Get.to(
+                                    () => (Newspage(
+                                      imgurl: hiveimgurl,
+                                      newstitle: hivenewstitle,
+                                      source: hivesourse,
+                                      description: hivedescription,
+                                      Date: hivedate,
+                                    )),
+                                  ),
+                              child: Newscardwidget(
+                                newstitle: hivenewstitle,
+                                source: hivesourse,
+                                imgurl: hiveimgurl,
+                                date: hivedate,
+                              )),
+                        );
+                      },
+                      separatorBuilder: (context, index) {
+                        return const SizedBox();
+                      },
+                      itemCount:
+                          newnewslist.length < 40 ? newnewslist.length : 40);
+            }));
   }
 }
 
@@ -93,10 +105,6 @@ class Newscardwidget extends StatelessWidget {
           height: 190,
           width: double.maxFinite,
           decoration: BoxDecoration(
-            image: DecorationImage(
-              fit: BoxFit.cover,
-              image: NetworkImage(imgurl),
-            ),
             color: const Color.fromARGB(255, 0, 0, 0),
             borderRadius: BorderRadius.circular(12),
             boxShadow: const [
@@ -111,9 +119,13 @@ class Newscardwidget extends StatelessWidget {
               ), //BoxShadow
             ],
           ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: CachedNetworkImage(fit: BoxFit.cover, imageUrl: imgurl),
+          ),
         ),
         Container(
-          padding: EdgeInsets.all(12),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             gradient: LinearGradient(
@@ -121,10 +133,10 @@ class Newscardwidget extends StatelessWidget {
               end: Alignment.bottomCenter,
               stops: [0.0, .3, 0.6, 0.9],
               colors: [
-                Color(0xffffff),
-                Color.fromARGB(255, 0, 0, 0).withOpacity(0.3),
-                Color.fromARGB(255, 0, 0, 0).withOpacity(0.6),
-                Color.fromARGB(255, 0, 0, 0).withOpacity(0.9)
+                const Color(0xffffff),
+                const Color.fromARGB(255, 0, 0, 0).withOpacity(0.3),
+                const Color.fromARGB(255, 0, 0, 0).withOpacity(0.6),
+                const Color.fromARGB(255, 0, 0, 0).withOpacity(0.9)
               ],
             ),
           ),
